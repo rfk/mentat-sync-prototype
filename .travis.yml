@@ -1,0 +1,26 @@
+language: python
+
+python:
+  - "2.7"
+
+services:
+  - mysql
+
+notifications:
+  email:
+    - rfkelly@mozilla.com
+  irc:
+    channels:
+      - "irc.mozilla.org#services-dev"
+    use_notice: false
+    skip_join: false
+
+install:
+  - make build
+
+before_script:
+  - mysql -e 'create database sync_test;'
+
+script:
+  - make test
+  - make test MOZSVC_SQLURI=pymysql://root@localhost/sync_test
