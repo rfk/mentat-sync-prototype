@@ -89,6 +89,57 @@ class TestAPI(FunctionalTestCase):
         resp = self.app.get(self.root + "/chunks/bbbbbbbb")
         self.assertEquals(resp.body, "beebeebeebeebeebeebeebeebee")
 
+    def test_cant_commit_conflicting_heads(self):
+        self.app.put(self.root + "/chunks/xx", "xx")
+        trn1 = randid()
+        self.app.put_json(self.root + "/transactions/" + trn1, {
+            "parent": ROOT_TRANSACTION,
+            "chunks": ["xx"],
+        })
+        trn2 = randid()
+        self.app.put_json(self.root + "/transactions/" + trn2, {
+            "parent": ROOT_TRANSACTION,
+            "chunks": ["xx"],
+        })
+        self.app.put_json(self.root + "/head", {
+            "head": trn1,
+        })
+        self.app.put_json(self.root + "/head", {
+            "head": trn2,
+        }, status=409)
+
+    def test_cant_commit_a_head_with_descendants(self):
+        self.app.put(self.root + "/chunks/xx", "xx")
+        trn1 = randid()
+        self.app.put_json(self.root + "/transactions/" + trn1, {
+            "parent": ROOT_TRANSACTION,
+            "chunks": ["xx"],
+        })
+        trn2 = randid()
+        self.app.put_json(self.root + "/transactions/" + trn2, {
+            "parent": trn1,
+            "chunks": ["xx"],
+        })
+        self.app.put_json(self.root + "/head", {
+            "head": trn1,
+        }, status=409)
+
+    def test_cant_reference_nonexistent_chunk(self):
+        trn1 = randid()
+        self.app.put_json(self.root + "/transactions/" + trn1, {
+            "parent": ROOT_TRANSACTION,
+            "chunks": ["xx"],
+        }, status=404)  # XXX TODO: should be a 400 error, not 404
+
+    def test_cant_descend_from_nonexistent_transaction(self):
+        self.app.put(self.root + "/chunks/xx", "xx")
+        trn1 = randid()
+        trn2 = randid()
+        self.app.put_json(self.root + "/transactions/" + trn2, {
+            "parent": trn1,
+            "chunks": ["xx"],
+        }, status=409)  # XXX TODO: should be a 400 error, not 409
+
 
 if __name__ == "__main__":
     # When run as a script, this file will execute the

@@ -6,10 +6,16 @@ import json
 
 from pyramid.security import Allow
 from pyramid.request import Response
+from pyramid.httpexceptions import HTTPNotFound, HTTPConflict
 
 from cornice import Service
 
-from mentatsync.storage import ROOT_TRANSACTION, get_storage
+from mentatsync.storage import (
+    ROOT_TRANSACTION,
+    get_storage,
+    NotFoundError,
+    ConflictError,
+)
 
 
 UUID_REGEX = "[a-z0-9-]{36}"  # XXX TODO: make more precise...
@@ -23,6 +29,17 @@ def default_acl(request):
     cornice takes a copy of it when constructing the pyramid view.
     """
     return [(Allow, request.matchdict["userid"], "owner")]
+
+
+def convert_storage_errors(func):
+    def wrapped(*args, **kwds):
+        try:
+            return func(*args, **kwds)
+        except NotFoundError:
+            raise HTTPNotFound()
+        except ConflictError:
+            raise HTTPConflict()
+    return wrapped
 
 
 class MentatSyncService(Service):
@@ -86,6 +103,7 @@ def get_head(request):
 
 
 @head.put()
+@convert_storage_errors
 def put_head(request):
     storage = get_storage(request)
     userid = request.matchdict["userid"]
@@ -96,6 +114,7 @@ def put_head(request):
 
 
 @transactions.get(renderer="json")
+@convert_storage_errors
 def get_transactions(request):
     storage = get_storage(request)
     userid = request.matchdict["userid"]
@@ -109,6 +128,7 @@ def get_transactions(request):
 
 
 @transaction.get(renderer="json")
+@convert_storage_errors
 def get_transaction(request):
     storage = get_storage(request)
     userid = request.matchdict["userid"]
@@ -123,6 +143,7 @@ def get_transaction(request):
 
 
 @transaction.put()
+@convert_storage_errors
 def put_transaction(request):
     storage = get_storage(request)
     userid = request.matchdict["userid"]
@@ -136,6 +157,7 @@ def put_transaction(request):
 
 
 @chunk.get()
+@convert_storage_errors
 def get_chunk(request):
     storage = get_storage(request)
     userid = request.matchdict["userid"]
@@ -145,6 +167,7 @@ def get_chunk(request):
 
 
 @chunk.put()
+@convert_storage_errors
 def put_chunk(request):
     storage = get_storage(request)
     userid = request.matchdict["userid"]
