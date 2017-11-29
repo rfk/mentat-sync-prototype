@@ -19,7 +19,7 @@ from mentatsync.storage import (
 
 
 UUID_REGEX = "[a-z0-9-]{36}"  # XXX TODO: make more precise...
-SHA256_REGEX = "[a-z0-9]{1,64}"  # XXX TODO: make more precise...
+CHUNKID_REGEX = "[a-z0-9-]{1,64}"  # XXX TODO: make more precise...
 
 
 def default_acl(request):
@@ -58,7 +58,7 @@ class MentatSyncService(Service):
         path = path.replace("{transaction}",
                             "{transaction:" + UUID_REGEX + "}")
         path = path.replace("{chunk}",
-                            "{chunk:" + SHA256_REGEX + "}")
+                            "{chunk:" + CHUNKID_REGEX + "}")
         # Add path prefix for the API version number and userid.
         path = "/{api:0\\.1}/{userid:" + UUID_REGEX + "}" + path
         return path
