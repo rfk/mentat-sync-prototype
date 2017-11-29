@@ -56,6 +56,16 @@ And can then upload new changes by doing something like:
   * This will be rejected if it doesn't descend from the current head
   * If rejected due to concurrent change, abort and resync
 
+If you want to try it out live, there's a dev copy (hopefully still) running at:
+
+  https://mentat.dev.lcip.org/mentatsync/
+
+So you can access it via e.g.:
+
+  https://mentat.dev.lcip.org/mentatsync/0.1/ddcf2b7e-cc6a-44ad-9caf-208345f6f28d/head
+
+
+
 Notes and things to figure out:
 
 * Should we add some sort of batching API to avoid O(N^2) HTTP requests during fetch, or rely on pipelining/HTTP2/whatever to make this efficient?
