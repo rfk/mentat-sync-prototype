@@ -11,7 +11,7 @@ Basic conceptual model:
   * There is a special "root" transaction with id "00000000-0000-0000-0000-000000000000"
 * Clients upload data in *chunks*, identified by SHA256 content hash.  Chunks are immutable and opaque.
 * Each transaction contains a strictly-ordered sequence of chunks, a parent transaction, and a sequence number.
-  * Each trasaction's sequence number is strictly greater than that of its parent
+  * Each transaction's sequence number is strictly greater than that of its parent
 * The transaction with the highest sequence number is the *HEAD*.
 * Clients can make their transactions visible to others by atomically advancing *HEAD* to a new transaction.
   * The new HEAD transaction must be a proper descendant of the current HEAD.
