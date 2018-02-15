@@ -30,4 +30,4 @@ test:
 	$(NOSE) $(TESTS)
 	# Test that live functional tests can run correctly, by actually
 	# spinning up a server and running them against it.
-	./local/bin/gunicorn --paste ./mentatsync/tests/tests.ini --workers 1 --worker-class mozsvc.gunicorn_worker.MozSvcGeventWorker & SERVER_PID=$$! ; sleep 2 ; ./local/bin/python mentatsync/tests/functional/test_api.py http://localhost:5000 ; kill $$SERVER_PID
+	./local/bin/gunicorn --paste ./mentatsync/tests/tests.ini --workers 1 --worker-class mozsvc.gunicorn_worker.MozSvcGeventWorker & SERVER_PID=$$! ; sleep 2 ; ./local/bin/python mentatsync/tests/functional/test_api.py http://localhost:5013 ; kill $$SERVER_PID

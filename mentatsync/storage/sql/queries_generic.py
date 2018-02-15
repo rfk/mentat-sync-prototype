@@ -83,11 +83,11 @@ COMMIT_PENDING_TRANSACTION = """
     WHERE userid = :userid
     AND next_head = :trnid
     AND prev_head = COALESCE((
-        SELECT trnid
-        FROM transactions
-        WHERE userid = :userid
-        AND committed
-        ORDER BY seq DESC LIMIT 1
+        SELECT trnid FROM (
+            SELECT trnid FROM transactions
+            WHERE userid = :userid AND committed
+            ORDER BY seq DESC LIMIT 1
+        ) as current_head
     ), '{}')
 """.format(ROOT_TRANSACTION)
 

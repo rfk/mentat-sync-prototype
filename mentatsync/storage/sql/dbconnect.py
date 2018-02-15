@@ -60,7 +60,7 @@ class Table(Table):
 
 
 def UUID():
-    return String(32)
+    return String(36)
 
 
 users = Table(
@@ -91,7 +91,8 @@ transaction_chunks = Table(
     metadata,
     Column("userid", UUID(), primary_key=True, nullable=False),
     Column("trnid", UUID(), primary_key=True, nullable=False),
-    Column("idx", Integer, primary_key=True, nullable=False),
+    Column("idx", Integer, primary_key=True, nullable=False,
+           autoincrement=False),
     Column("chunk", UUID(), nullable=False),
 )
 
