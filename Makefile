@@ -5,8 +5,9 @@ PYTHON = local/bin/python
 PIP = local/bin/pip
 PIP_CACHE = /tmp/pip-cache.${USER}
 BUILD_TMP = /tmp/mentatsync-build.${USER}
+MOZSVC_SQLURI = sqlite:///:memory:
 
-export MOZSVC_SQLURI = sqlite:///:memory:
+export MOZSVC_SQLURI
 
 INSTALL = ARCHFLAGS=$(ARCHFLAGS) $(PIP) install -U
 
