@@ -63,9 +63,9 @@ CREATE_PENDING_TRANSACTION_FROM_ROOT = """
 
 CREATE_PENDING_TRANSACTION = """
     INSERT INTO transactions
-        (userid, trnid, parent, committed, seq, prev_head, next_head)
-    SELECT :userid, :trnid, tprev.trnid, 0, tprev.seq + 1,
-           tprev.prev_head, :trnid
+        (userid, trnid, parent, committed, seq, next_head, prev_head)
+    SELECT :userid, :trnid, tprev.trnid, 0, tprev.seq + 1, :trnid,
+        CASE WHEN committed THEN :parent ELSE tprev.prev_head END AS cur_head
     FROM transactions AS tprev
     WHERE tprev.userid = :userid AND tprev.trnid = :parent
     AND tprev.next_head = :parent

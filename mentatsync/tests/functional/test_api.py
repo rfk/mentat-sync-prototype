@@ -89,6 +89,79 @@ class TestAPI(FunctionalTestCase):
         resp = self.app.get(self.root + "/chunks/bbbbbbbb")
         self.assertEquals(resp.body, "beebeebeebeebeebeebeebeebee")
 
+    def test_multiple_head_increments(self):
+        # Initially, head is the empty root transaction.
+        resp = self.app.get(self.root + "/head")
+        self.assertEqual(resp.json["head"], ROOT_TRANSACTION)
+
+        # We can upload some chunks.
+        self.app.put(self.root + "/chunks/aaaaaaaa",
+                     "ayayayayayayayayayayayaya", status=201)
+        self.app.put(self.root + "/chunks/bbbbbbbb",
+                     "beebeebeebeebeebeebeebeebee", status=201)
+
+        # And link them into a transaction.
+        trn1 = randid()
+        self.app.put_json(self.root + "/transactions/" + trn1, {
+            "parent": ROOT_TRANSACTION,
+            "chunks": ["bbbbbbbb", "aaaaaaaa"],
+        })
+
+        # And make it the new head.
+        self.app.put_json(self.root + "/head", {
+            "head": trn1,
+        }, status=204)
+
+        # It will become the new head.
+        resp = self.app.get(self.root + "/head")
+        self.assertEqual(resp.json["head"], trn1)
+
+        # We can add a second transaction descending from the first.
+        self.app.put(self.root + "/chunks/cccccccc",
+                     "sisisisisisisisisisi", status=201)
+
+        trn2 = randid()
+        self.app.put_json(self.root + "/transactions/" + trn2, {
+            "parent": trn1,
+            "chunks": ["cccccccc"],
+        })
+
+        # We can commit the second transaction as the new head.
+        self.app.put_json(self.root + "/head", {
+            "head": trn2,
+        }, status=204)
+
+        # It will become the new head.
+        resp = self.app.get(self.root + "/head")
+        self.assertEqual(resp.json["head"], trn2)
+
+        # We can add a third transaction descending from the second.
+        trn3 = randid()
+        self.app.put_json(self.root + "/transactions/" + trn3, {
+            "parent": trn2,
+            "chunks": ["cccccccc", "aaaaaaaa"],
+        })
+
+        # But not set is as the new head.
+        resp = self.app.get(self.root + "/head")
+        self.assertEqual(resp.json["head"], trn2)
+
+        # We can add a fourth transaction descending from the third.
+        trn4 = randid()
+        self.app.put_json(self.root + "/transactions/" + trn4, {
+            "parent": trn3,
+            "chunks": ["cccccccc", "bbbbbbbb"],
+        })
+
+        # We can commit the fourth transaction as the new head.
+        self.app.put_json(self.root + "/head", {
+            "head": trn4,
+        }, status=204)
+
+        # It will become the new head.
+        resp = self.app.get(self.root + "/head")
+        self.assertEqual(resp.json["head"], trn4)
+
     def test_cant_commit_conflicting_heads(self):
         self.app.put(self.root + "/chunks/xx", "xx")
         trn1 = randid()
