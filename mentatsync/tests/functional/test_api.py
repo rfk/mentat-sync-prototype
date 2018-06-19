@@ -213,6 +213,28 @@ class TestAPI(FunctionalTestCase):
             "chunks": ["xx"],
         }, status=409)  # XXX TODO: should be a 400 error, not 409
 
+    def test_clearing_user_data(self):
+        # Write some data, and check that it appears.
+        trn1 = randid()
+        self.app.put(self.root + "/chunks/aaaaaaaa",
+                     "ayayayayayayayayayayayaya", status=201)
+        self.app.put_json(self.root + "/transactions/" + trn1, {
+            "parent": ROOT_TRANSACTION,
+            "chunks": ["aaaaaaaa"],
+        })
+        self.app.put_json(self.root + "/head", {
+            "head": trn1,
+        }, status=204)
+        resp = self.app.get(self.root + "/head")
+        self.assertEqual(resp.json["head"], trn1)
+
+        # Clear all the data we just wrote.
+        resp = self.app.delete(self.root)
+
+        # The store should look empty.
+        resp = self.app.get(self.root + "/head")
+        self.assertEqual(resp.json["head"], ROOT_TRANSACTION)
+
 
 if __name__ == "__main__":
     # When run as a script, this file will execute the

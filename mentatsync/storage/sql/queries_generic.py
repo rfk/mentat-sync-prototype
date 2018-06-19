@@ -42,6 +42,11 @@ GET_TRANSACTIONS_FROM_ROOT = """
     LIMIT :limit
 """
 
+DELETE_ALL_TRANSACTIONS = """
+    DELETE FROM transactions
+    WHERE userid = :userid
+"""
+
 GET_TRANSACTION = """
     SELECT trnid, parent, seq
     FROM transactions

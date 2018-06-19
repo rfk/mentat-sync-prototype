@@ -50,6 +50,10 @@ class MentatSyncStorage(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
+    def reset(self, userid):
+        """Discard all data stored for the given userid."""
+
+    @abc.abstractmethod
     def get_head(self, userid):
         """Returns the transaction id for the current head."""
 

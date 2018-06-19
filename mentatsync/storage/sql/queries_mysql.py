@@ -7,3 +7,14 @@ Custom queries for MySQL.
 This module overrides some queries from queries_generic.py with code
 tailored to MySQL.
 """
+
+# We can use mysql's multi-table delete to transitively
+# remove chunk data when clearing a user's transactions.
+
+DELETE_ALL_TRANSACTIONS = """
+    DELETE transactions, transaction_chunks, chunks
+    FROM transactions
+      INNER JOIN transaction_chunks USING (userid, trnid)
+      INNER JOIN chunks USING (userid)
+    WHERE transactions.userid = :userid
+"""

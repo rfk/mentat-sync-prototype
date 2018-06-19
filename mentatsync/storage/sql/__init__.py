@@ -47,6 +47,15 @@ class SQLStorage(MentatSyncStorage):
         self.sqluri = sqluri
         self.dbconnector = DBConnector(sqluri, **dbkwds)
 
+    def reset(self, userid):
+        # Deleting all transactions is sufficient to reset the user's
+        # storage state.  It might leave some orphaned chunk data but
+        # that can be dealth with via background garbage collection.
+        with self.dbconnector.connect() as session:
+            session.query("DELETE_ALL_TRANSACTIONS", {
+                "userid": userid
+            })
+
     def get_head(self, userid):
         with self.dbconnector.connect() as session:
             head = session.query_scalar("GET_HEAD", {
