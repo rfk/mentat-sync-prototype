@@ -26,6 +26,7 @@ Basic conceptual model:
 Basic operations:
 
 * `GET /0.1/{user}/` - get basic info about the store; currently does nothing
+* `DELETE /0.1/{user}/` - clear all stored data for a user; probably only useful during development...
 * `GET /0.1/{user}/head` - get transaction id of the current head
 * `PUT /0.1/{user}/head` - update current head to new transaction id
 * `GET /0.1/{user}/transactions` - get transaction ids in increasing sequence order

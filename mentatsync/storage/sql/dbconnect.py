@@ -63,14 +63,6 @@ def UUID():
     return String(36)
 
 
-users = Table(
-    "users",
-    metadata,
-    Column("userid", UUID(), primary_key=True, nullable=False),
-    Column("head", UUID(), primary_key=True, nullable=False),
-)
-
-
 transactions = Table(
     "transactions",
     metadata,
@@ -239,7 +231,6 @@ class DBConnector(object):
 
         # Create the tables if necessary.
         if create_tables:
-            users.create(self.engine, checkfirst=True)
             transactions.create(self.engine, checkfirst=True)
             transaction_chunks.create(self.engine, checkfirst=True)
             chunks.create(self.engine, checkfirst=True)

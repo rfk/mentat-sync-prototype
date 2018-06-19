@@ -93,6 +93,15 @@ def get_root(request):
     return "ok"
 
 
+@root.delete()
+def delete_root(request):
+    storage = get_storage(request)
+    userid = request.matchdict["userid"]
+    storage.reset(userid)
+    request.response.status = 204
+    return request.response
+
+
 @head.get(renderer="json")
 def get_head(request):
     storage = get_storage(request)
